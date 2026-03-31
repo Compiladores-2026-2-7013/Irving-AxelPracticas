@@ -1,0 +1,36 @@
+%{
+#include <stdio.h>
+%}
+
+/* Opción para que Flex gestione automáticamente el conteo de líneas */
+%option yylineno
+%option noyywrap
+
+%%
+
+^.* { 
+          /* ^ coincide con el inicio de una línea */
+          /* .* captura todo el contenido hasta el salto de línea */
+          printf("%d  %s", yylineno, yytext); 
+        }
+
+\n      { 
+          /* Si la línea está vacía, imprimimos solo el número y el salto */
+          /* O simplemente dejamos que el ECHO por defecto actúe si no hay texto */
+          printf("\n");
+        }
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        yyin = fopen(argv[1], "r");
+        if (!yyin) {
+            fprintf(stderr, "No se pudo abrir el archivo %s\n", argv[1]);
+            return 1;
+        }
+    }
+    
+    yylex();
+    return 0;
+}
